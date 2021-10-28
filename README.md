@@ -23,7 +23,7 @@ Currently supported are:
 
 ## Configuration
 
-The configuration is written in hcl in .tfvaultenv.config.hcl. By default tfvaultenv will search up to 3 parent directories for the config. This is useful in nested Terraform directory structure scenarios.
+The configuration is written in hcl in `.tfvaultenv.config.hcl`. By default tfvaultenv will look in the current working directory for the config file. You can optionally set the `TFVAULTENV_CONFIG_DEPTH` environment variable to search up to N parent directories. This is useful in nested Terraform directory structure scenarios.
 
 ### Active Directory
 
