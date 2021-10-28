@@ -14,7 +14,7 @@ func getPath(depth int, filename string) string {
 	}
 
 	var pathPrefix string
-	for i := 0; i <= depth; i++ {
+	for i := 0; i < depth; i++ {
 		pathPrefix += fmt.Sprintf("..%s", sep)
 	}
 
@@ -29,5 +29,5 @@ func FindConfigFile(depth int, filename string) (string, error) {
 			return path, nil
 		}
 	}
-	return "", fmt.Errorf("unable to locate %s at parentdepth=%d", filename, depth)
+	return "", fmt.Errorf("unable to locate %s at", filename)
 }
