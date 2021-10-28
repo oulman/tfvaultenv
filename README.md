@@ -21,6 +21,12 @@ Currently supported are:
 - Infoblox
 - AWS
 
+## Installation
+
+- Download the release for your platform from [Releases](https://github.com/oulman/tfvaultenv/releases)
+- untar or unzip the file and move tfvaultenv into your $PATH
+- Create a .tfvaultenv.config.hcl file in your Terraform project. (see Configuration below and the examples directory)
+
 ## Configuration
 
 The configuration is written in hcl in `.tfvaultenv.config.hcl`. By default tfvaultenv will look in the current working directory for the config file. You can optionally set the `TFVAULTENV_CONFIG_DEPTH` environment variable to search up to N parent directories. This is useful in nested Terraform directory structure scenarios.
