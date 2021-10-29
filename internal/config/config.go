@@ -211,6 +211,8 @@ func ProcessConfig(c *Config) error {
 			if err != nil {
 				return errors.Wrap(err, "failed to set AWS STS environment variables")
 			}
+		default:
+			return fmt.Errorf("invalid method %s for AWS secrets engine", c.Aws.Method)
 		}
 	}
 	return nil
