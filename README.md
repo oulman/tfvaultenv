@@ -29,13 +29,15 @@ Currently supported are:
 
 ## Configuration
 
-The configuration is written in hcl in `.tfvaultenv.config.hcl`. By default tfvaultenv will look in the current working directory for the config file. You can optionally set the `--config` and `--configdepth` arguments to change the config file name or search up to N parent directories. This is useful in nested Terraform directory structure scenarios.
+The configuration is written in [HCL](https://github.com/hashicorp/hcl) and the default name is `.tfvaultenv.config.hcl`. Unless overridden, tfvaultenv will look in the current working directory for the config file. You can optionally set the `--config` and `--configdepth` arguments to change the config file name or search up to N parent directories. This is useful in nested Terraform directory structure scenarios.
 
-Namespaces are currently not supported but are on the [roadmap](https://github.com/oulman/tfvaultenv/docs/ROADMAP.md)
+Configuration is set in blocks representing supported secrets engines and authentication methods.
 
-### AWS
+### Secrets Engines
 
-#### Example
+#### AWS
+
+##### Example
 
 ```hcl
 aws "sts" {
@@ -49,7 +51,7 @@ aws "sts" {
 }
 ```
 
-#### Arguments
+##### Arguments
 
 - `method`: (Required) Name of the [AWS Secrets Engine Method](https://www.vaultproject.io/docs/secrets/aws) Currently only `assumed_role` is supported
 - `role`: (Required) AWS Secrets Engine role name
@@ -58,9 +60,9 @@ aws "sts" {
 - `mount`: (Optional) Path to the mounted AWS secrets engine. Default: `aws`
 - `ttl`: (Optional) TTL to set on the token or iam_user
 
-### Active Directory
+#### Active Directory
 
-#### Example
+##### Example
 
 ```hcl
 ad "vsphere" {
@@ -72,16 +74,16 @@ ad "vsphere" {
 }
 ```
 
-#### Arguments
+##### Arguments
 
 - `role`: (Required) Name of the [Vault Active Directory Secrets Engine role name](https://www.vaultproject.io/docs/secrets/ad)
 - `target_provider`: (Required) Name of the Terraform provider to generate environment variables for
 - `extra_env_vars`: (Optional) Map of additional environment variables to set
 - `path`: (Optional) Path to the mounted AD secrets engine. Default: `ad`
 
-### Kv2 Secret
+#### Kv2 Secret
 
-#### Example
+##### Example
 
 ```hcl
 kv_secret "infoblox" {
@@ -97,7 +99,7 @@ kv_secret "infoblox" {
 }
 ```
 
-#### Arguments
+##### Arguments
 
 - `path`: (Required) Path to the secret under the secrets engine mount
 - `mount`: (Optional) Mount name of the secrets engine. Default: "secrets"
@@ -105,13 +107,13 @@ kv_secret "infoblox" {
 - `target_provider`: (Required) Name of the Terraform provider to generate environment variables for
 - `extra_env_vars`: (Optional) Map of additional environment variables to set
 
-## Authentication
+### Auth Methods
 
-Currently `tfvaultenv` only supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Future support for JWT, AWS, Azure, GCP, PKI, and other methods are planned.
+Currently `tfvaultenv` only supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Future support for JWT, AWS, Azure, GCP, PKI, and other methods are planned. See the [roadmap](ROADMAP.md) for more details.
 
 ## Usage
 
-### Persisting environment variables
+### Setting environment variables
 
 ```
 $ export `tfvaultenv get`
@@ -137,7 +139,7 @@ AWS_ACCESS_SECRET_KEY=nJJFD/<SNIP>
 AWS_ACCESS_SESSION_TOKEN=<SNIP>
 ```
 
-### Specifying a different configuration file
+### Specifying an alternate configuration file
 
 ```
 $ tfvaultenv get --config /path/to/config.hcl
