@@ -1,58 +1,22 @@
+/*
+Copyright © 2021 James Oulman
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	"fmt"
-	"math/rand"
-	"os"
-	"strconv"
-	"time"
-
-	config "github.com/oulman/tfvaultenv/internal/config"
-	"github.com/pkg/errors"
-)
-
-const (
-	configFileName = ".tfvaultenv.config.hcl"
-	defaultDepth   = 0
-)
+import "github.com/oulman/tfvaultenv/cmd"
 
 func main() {
-	if err := inner(); err != nil {
-		fmt.Printf("tfvaultenv error: %s\n", err.Error())
-		os.Exit(1)
-	}
-}
-
-func inner() error {
-
-	// There is a random function for the HCL configuration.
-	rand.Seed(time.Now().Unix())
-
-	depth := defaultDepth
-	d := os.Getenv("TFVAULENV_CONFIG_DEPTH")
-	if d != "" {
-		v, err := strconv.Atoi(d)
-		if err != nil {
-			depth = v
-		} else {
-			return errors.Wrap(err, "invalid TFVAULENV_CONFIG_DEPTH")
-		}
-	}
-
-	configFilePath, err := config.FindConfigFile(depth, configFileName)
-	if err != nil {
-		return err
-	}
-
-	configParsed, err := config.ParseConfig(configFilePath)
-	if err != nil {
-		return err
-	}
-
-	err = config.ProcessConfig(configParsed)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	cmd.Execute()
 }
