@@ -15,7 +15,7 @@ ad "infoblox" {
 }
 
 aws "sts" {
-   method = "sts"
+   method = "assumed_role"
    role = "terraform"
    role_arn = "arn:aws:iam::0000000000:role/Terraform"
    ttl = 900
