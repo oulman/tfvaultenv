@@ -13,24 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-package providers
+package cmd
 
 import (
-	"errors"
-	"fmt"
+	"github.com/spf13/cobra"
 )
 
-func SetVsphereEnv(username string, password string, extraEnvVars map[string]string) (string, error) {
-	if username == "" || password == "" {
-		return "", errors.New("vsphere username or password are empty")
-	}
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "tfvaultenv",
+	Short: "A utility for configuring Terraform provider environment variables from HashiCorp Vault secrets",
+	Long:  "",
+}
 
-	fmt.Printf("VSPHERE_USERNAME=%s\n", username)
-	fmt.Printf("VSPHERE_PASSWORD=%s\n", password)
-
-	for k, v := range extraEnvVars {
-		fmt.Printf("%s=%s\n", k, v)
-	}
-	return "", nil
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	cobra.CheckErr(rootCmd.Execute())
 }
