@@ -49,7 +49,7 @@ type Aws struct {
 	Name         string            `hcl:",label"`
 	Method       string            `hcl:"method"`
 	Role         string            `hcl:"role"`
-	RoleArn      string            `hcl:"role_arn"`
+	RoleArn      string            `hcl:"role_arn,optional"`
 	Ttl          string            `hcl:"ttl"`
 	ExtraEnvVars map[string]string `hcl:"extra_env_vars,optional"`
 	Mount        string            `hcl:"mount,optional"`
@@ -62,16 +62,15 @@ func (a *Aws) IsEmpty() bool {
 type Ad struct {
 	Name           string            `hcl:",label"`
 	Role           string            `hcl:"role"`
-	Path           string            `hcl:"path,optional"`
+	Mount          string            `hcl:"mount,optional"`
 	TargetProvider string            `hcl:"target_provider"`
 	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
-	Mount          string            `hcl:"mount,optional"`
 }
 
 type KvSecret struct {
 	Name           string            `hcl:",label"`
-	Mount          string            `hcl:"mount"`
 	Path           string            `hcl:"path"`
+	Mount          string            `hcl:"mount,optional"`
 	TargetProvider string            `hcl:"target_provider"`
 	AttributeMap   map[string]string `hcl:"attribute_map,optional"`
 	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
@@ -128,7 +127,7 @@ func ProcessConfig(c *Config) error {
 	for _, v := range c.Ad {
 		switch v.TargetProvider {
 		case "vsphere":
-			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Path)
+			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Mount)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault Ad secrets engine")
 			}
@@ -138,7 +137,7 @@ func ProcessConfig(c *Config) error {
 				return errors.Wrap(err, "failed to set vsphere environment variables")
 			}
 		case "infoblox":
-			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Path)
+			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Mount)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault Ad secrets engine")
 			}
@@ -148,7 +147,7 @@ func ProcessConfig(c *Config) error {
 				return errors.Wrap(err, "failed to set infoblox environment variables")
 			}
 		case "f5":
-			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Path)
+			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Mount)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault Ad secrets engine")
 			}
@@ -202,7 +201,7 @@ func ProcessConfig(c *Config) error {
 
 	if c.Aws != nil && !c.Aws.IsEmpty() {
 		switch c.Aws.Method {
-		case "sts":
+		case "assumed_role":
 			secret, err := vaulthelper.ReadAwsStsSecretsEngine(client, c.Aws.Mount, c.Aws.Role, c.Aws.RoleArn, c.Aws.Ttl)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault AWS secrets engine")

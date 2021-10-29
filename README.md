@@ -2,24 +2,24 @@
 
 ## Overview
 
-tfvaultenv reads secrets from HashiCorp Vault and outputes environment variables for various Terraform providers with those secrets.
+tfvaultenv reads secrets from HashiCorp Vault and outputs environment variables for various Terraform providers with those secrets.
 
-This project is a work in progress and additional Secrets Engines, Providers, and features are planned.
+This project is a work in progress and additional Secrets Engines, Providers, and features are planned. Please see the project [roadmap](ROADMAP.md) for more details.
 
 Currently supported are:
 
 ### Secrets Engines
 
 - [Active Directory](https://www.vaultproject.io/docs/secrets/ad) (Password Rotation)
-- Kv2
-- AWS STS
+- [Kv2](https://www.vaultproject.io/docs/secrets/kv/kv-v2)
+- [AWS](https://www.vaultproject.io/docs/secrets/aws) (STS only currently)
 
 ### Terraform Providers
 
-- vSphere
-- F5 BIG IP
-- Infoblox
-- AWS
+- [vSphere](https://registry.terraform.io/providers/hashicorp/vsphere/latest/docs)
+- [F5 BIG IP](https://registry.terraform.io/providers/F5Networks/bigip/latest)
+- [Infoblox](https://registry.terraform.io/providers/infobloxopen/infoblox/latest)
+- [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest)
 
 ## Installation
 
@@ -29,7 +29,34 @@ Currently supported are:
 
 ## Configuration
 
-The configuration is written in hcl in `.tfvaultenv.config.hcl`. By default tfvaultenv will look in the current working directory for the config file. You can optionally set the `TFVAULTENV_CONFIG_DEPTH` environment variable to search up to N parent directories. This is useful in nested Terraform directory structure scenarios.
+The configuration is written in hcl in `.tfvaultenv.config.hcl`. By default tfvaultenv will look in the current working directory for the config file. You can optionally set the `--config` and `--configdepth` arguments to change the config file name or search up to N parent directories. This is useful in nested Terraform directory structure scenarios.
+
+Namespaces are currently not supported but are on the [roadmap](https://github.com/oulman/tfvaultenv/docs/ROADMAP.md)
+
+### AWS
+
+#### Example
+
+```hcl
+aws "sts" {
+   method = "assumed_role"
+   role = "rolename"
+   role_arn = "arn:aws:iam::00000000000:role/TerraformRole"
+   extra_env_vars = {
+       "AWS_DEFAULT_REGION" = "us-east-2"
+   }
+   ttl = 900
+}
+```
+
+#### Arguments
+
+- `method`: (Required) Name of the [AWS Secrets Engine Method](https://www.vaultproject.io/docs/secrets/aws) Currently only `assumed_role` is supported
+- `role`: (Required) AWS Secrets Engine role name
+- `role_arn`: (Optional) Role ARN to assume when method is set to `assumed_role`
+- `extra_env_vars`: (Optional) Map of additional environment variables to set
+- `mount`: (Optional) Path to the mounted AWS secrets engine. Default: `aws`
+- `ttl`: (Optional) TTL to set on the token or iam_user
 
 ### Active Directory
 
@@ -50,13 +77,44 @@ ad "vsphere" {
 - `role`: (Required) Name of the [Vault Active Directory Secrets Engine role name](https://www.vaultproject.io/docs/secrets/ad)
 - `target_provider`: (Required) Name of the Terraform provider to generate environment variables for
 - `extra_env_vars`: (Optional) Map of additional environment variables to set
+- `path`: (Optional) Path to the mounted AD secrets engine. Default: `ad`
+
+### Kv2 Secret
+
+#### Example
+
+```hcl
+kv_secret "infoblox" {
+   path = "infoblox/terraform"
+   target_provider = "infoblox"
+   attribute_map = {
+       "ib_user"     = "username"
+       "ib_password" = "password"
+   }
+   extra_env_vars = {
+       "FOO" = "bar"
+   }
+}
+```
+
+#### Arguments
+
+- `path`: (Required) Path to the secret under the secrets engine mount
+- `mount`: (Optional) Mount name of the secrets engine. Default: "secrets"
+- `attribute_map`: (Optional) Map of kv2 secret attribute names to provider values. Defaults to username and password
+- `target_provider`: (Required) Name of the Terraform provider to generate environment variables for
+- `extra_env_vars`: (Optional) Map of additional environment variables to set
+
+## Authentication
+
+Currently `tfvaultenv` only supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Future support for JWT, AWS, Azure, GCP, PKI, and other methods are planned.
 
 ## Usage
 
 ### Persisting environment variables
 
 ```
-$ export `tfvaultenv`
+$ export `tfvaultenv get`
 $ env | grep AWS_
 AWS_ACCESS_KEY_ID=ASIA<SNIP>
 AWS_ACCESS_SECRET_KEY=nJJFD/<SNIP>
@@ -66,15 +124,21 @@ AWS_ACCESS_SESSION_TOKEN=<SNIP>
 ### Piping to Terraform
 
 ```
-$ tfvaultenv | terraform apply
+$ tfvaultenv get | terraform apply
 <SNIP>
 ```
 
 ### Printing to stdout
 
 ```
-$ tfvaultenv
+$ tfvaultenv get
 AWS_ACCESS_KEY_ID=ASIA<SNIP>
 AWS_ACCESS_SECRET_KEY=nJJFD/<SNIP>
 AWS_ACCESS_SESSION_TOKEN=<SNIP>
+```
+
+### Specifying a different configuration file
+
+```
+$ tfvaultenv get --config /path/to/config.hcl
 ```
