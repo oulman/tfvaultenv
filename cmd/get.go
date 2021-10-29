@@ -33,6 +33,13 @@ var getCmd = &cobra.Command{
 	Short: "queries Vault for secrets and outputs them in environment variables",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
+
+		logrus.SetFormatter(&logrus.TextFormatter{
+			DisableLevelTruncation: true,
+			PadLevelText:           true,
+			DisableTimestamp:       true,
+		})
+
 		// There is a random function for the HCL configuration.
 		rand.Seed(time.Now().Unix())
 
