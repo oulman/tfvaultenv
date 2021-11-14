@@ -60,6 +60,25 @@ aws "sts" {
 - `mount`: (Optional) Path to the mounted AWS secrets engine. Default: `aws`
 - `ttl`: (Optional) TTL to set on the token or iam_user
 
+#### Azure
+##### Example
+
+```hcl
+azure "sub1" {
+   role = "sub1-rw"
+   extra_env_vars = {
+       "ARM_TENANT_ID" = "194dd302-295b-4993-b29e-2ca2d37b9031"
+       "ARM_SUBSCRIPTION_ID" = "9b9c4322-74a2-474e-ad94-c5e6890713c9"
+   }
+}
+```
+
+##### Arguments
+
+- `role`: (Required) Azure Secrets Engine role name
+- `extra_env_vars`: (Optional) Map of additional environment variables to set
+- `mount`: (Optional) Path to the mounted Azure secrets engine. Default: `azure`
+
 #### Active Directory
 
 ##### Example

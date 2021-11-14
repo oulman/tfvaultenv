@@ -35,6 +35,7 @@ type Config struct {
 	Auth     []*Auth     `hcl:"auth,block"`
 	Ad       []*Ad       `hcl:"ad,block"`
 	Aws      *Aws        `hcl:"aws,block"`
+	Azure    *Azure      `hcl:"azure,block"`
 	KvSecret []*KvSecret `hcl:"kv_secret,block"`
 }
 
@@ -57,6 +58,17 @@ type Aws struct {
 
 func (a *Aws) IsEmpty() bool {
 	return reflect.DeepEqual(a, Aws{})
+}
+
+type Azure struct {
+	Name         string            `hcl:",label"`
+	Role         string            `hcl:"role"`
+	ExtraEnvVars map[string]string `hcl:"extra_env_vars,optional"`
+	Mount        string            `hcl:"mount,optional"`
+}
+
+func (a *Azure) IsEmpty() bool {
+	return reflect.DeepEqual(a, Azure{})
 }
 
 type Ad struct {
@@ -215,5 +227,18 @@ func ProcessConfig(c *Config) error {
 			return fmt.Errorf("invalid method %s for AWS secrets engine", c.Aws.Method)
 		}
 	}
+
+	if c.Azure != nil {
+		secret, err := vaulthelper.ReadAzureSecretsEngine(client, c.Azure.Mount, c.Azure.Role)
+		if err != nil {
+			return errors.Wrap(err, "reading Vault Azure secrets engine")
+		}
+
+		_, err = providers.SetAzureEnv(*secret, c.Azure.ExtraEnvVars)
+		if err != nil {
+			return errors.Wrap(err, "failed to set Azure environment variables")
+		}
+	}
+
 	return nil
 }

@@ -9,7 +9,6 @@ These are the currenly planned features. If you have additional features or prov
 
 ### Secrets Engines
 
-- [Azure](https://www.vaultproject.io/docs/secrets/azure)
 - [GCP](https://www.vaultproject.io/docs/secrets/gcp)
 - [Ephemeral Signed SSH Certificates](https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates)
 - Databases
