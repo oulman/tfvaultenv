@@ -130,6 +130,37 @@ kv_secret "infoblox" {
 
 Currently `tfvaultenv` only supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Future support for JWT, AWS, Azure, GCP, PKI, and other methods are planned. See the [roadmap](ROADMAP.md) for more details.
 
+#### Common arguments
+
+- `method`: (Required) Name of the Vault authentication method
+- `path`: (Required) Path to the auth engine mount
+- `priority`: (Required) Priority
+- `when`: (Optional) Conditional block methods to determine if the auth method should be used. Currently only `env_present` is supported.
+
+#### JWT
+
+```hcl
+auth "gitlab" {
+  method = "jwt"
+  path = "gitlab"
+  priority = 100
+
+  jwt {
+    role = env("VAULT_ROLE")
+    token = env("CI_JOB_JWT")
+  }
+
+  when {
+    env_present = "CI_JOB_JWT"
+  }
+}
+```
+
+##### Arguments
+
+- `role`: (Required) Name of the JWT auth engine role
+- `token`: (Required) JWT token to pass to Vault API
+
 ## Usage
 
 ### Setting environment variables

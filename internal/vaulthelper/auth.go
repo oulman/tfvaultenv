@@ -16,21 +16,23 @@ limitations under the License.
 
 package vaulthelper
 
-// import (
-// 	"fmt"
+import (
+	"fmt"
 
-// 	"github.com/hashicorp/go-hclog"
-// 	"github.com/hashicorp/go-secure-stdlib/awsutil"
-// )
+	"github.com/hashicorp/vault/api"
+	// "github.com/hashicorp/go-hclog"
+	// "github.com/hashicorp/go-secure-stdlib/awsutil"
+)
 
-// const (
-// 	accessKey    = ""
-// 	secretKey    = ""
-// 	sessionToken = ""
-// 	headerValue  = ""
-// )
+const (
+	accessKey      = ""
+	secretKey      = ""
+	sessionToken   = ""
+	headerValue    = ""
+	jwtDefaultPath = "jwt"
+)
 
-// // AuthAws() returns
+// AuthAws() returns
 // func AuthAws() (string, error) {
 
 // 	// the Vault awsutil helpers require a logger but for our purposes
@@ -66,3 +68,31 @@ package vaulthelper
 
 // 	return secret, nil
 // }
+
+func AuthJwt(client *api.Client, mount string, role string, jwt string) (*api.Secret, error) {
+
+	if role == "" || jwt == "" {
+		return nil, fmt.Errorf("empty role or jwt passed to AutoJwt()")
+	}
+
+	if mount == "" {
+		mount = jwtDefaultPath
+	}
+
+	payload := map[string]interface{}{
+		"role": role,
+		"jwt":  jwt,
+	}
+
+	path := fmt.Sprintf("auth/%s/login", mount)
+	secret, err := client.Logical().Write(path, payload)
+
+	if err != nil {
+		return nil, err
+	}
+	if secret == nil {
+		return nil, fmt.Errorf("empty response from credential provider")
+	}
+
+	return secret, nil
+}

@@ -29,13 +29,13 @@ const (
 	defaultKv2PasswordAttributeName = "password"
 )
 
-type Kv2SecretsEngineResponse struct {
+type Kv2SecretsEngineUserPassResponse struct {
 	Username string
 	Password string
 }
 
-func ReadKv2SecretsEngine(client *api.Client, mountPath string, secretPath string, attributeMap map[string]string) (*Kv2SecretsEngineResponse, error) {
-	resp := &Kv2SecretsEngineResponse{}
+func ReadKv2SecretsEngineUserPass(client *api.Client, mountPath string, secretPath string, attributeMap map[string]string) (*Kv2SecretsEngineUserPassResponse, error) {
+	resp := &Kv2SecretsEngineUserPassResponse{}
 
 	if mountPath == "" {
 		mountPath = defaultKv2SecretEnginePath
@@ -45,12 +45,17 @@ func ReadKv2SecretsEngine(client *api.Client, mountPath string, secretPath strin
 		return resp, errors.New("empty rolename provided to secrets engine reader")
 	}
 
+	// initialize the attributeMap if it wasnt defined in the config
+	if attributeMap == nil {
+		attributeMap = make(map[string]string)
+	}
+
 	am := parseAttributeMap(attributeMap)
 	if len(am) == 0 {
 		return resp, fmt.Errorf("unable to parse attribute map")
 	}
 
-	vaultSecretPath := fmt.Sprintf("%s/%s", mountPath, secretPath)
+	vaultSecretPath := fmt.Sprintf("%s/data/%s", mountPath, secretPath)
 
 	secret, err := client.Logical().Read(vaultSecretPath)
 	if err != nil {
@@ -61,8 +66,20 @@ func ReadKv2SecretsEngine(client *api.Client, mountPath string, secretPath strin
 		return resp, errors.Wrap(err, fmt.Sprintf("failed to read secret from Vault at %s\n", vaultSecretPath))
 	}
 
-	resp.Username = secret.Data[am["username"]].(string)
-	resp.Password = secret.Data[am["password"]].(string)
+	m, ok := secret.Data["data"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("unable to extract secrets from kv2 response")
+	}
+
+	resp.Username, ok = m[am["username"]].(string)
+	if !ok {
+		return nil, fmt.Errorf("unable to extract username from kv2 response")
+	}
+
+	resp.Password, ok = m[am["password"]].(string)
+	if !ok {
+		return nil, fmt.Errorf("unable to extract password from kv2 response")
+	}
 
 	return resp, nil
 }

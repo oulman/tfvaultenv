@@ -1,96 +1,20 @@
-/*
-Copyright © 2021 James Oulman
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package config
 
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"reflect"
+	"sort"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/pkg/errors"
+	"github.com/zclconf/go-cty/cty/function"
 
 	providers "github.com/oulman/tfvaultenv/internal/providers"
 	vaulthelper "github.com/oulman/tfvaultenv/internal/vaulthelper"
 )
-
-type Config struct {
-	Auth     []*Auth     `hcl:"auth,block"`
-	Ad       []*Ad       `hcl:"ad,block"`
-	Aws      *Aws        `hcl:"aws,block"`
-	Azure    *Azure      `hcl:"azure,block"`
-	KvSecret []*KvSecret `hcl:"kv_secret,block"`
-}
-
-type Auth struct {
-	Name   string `hcl:",label"`
-	Method string `hcl:"method"`
-	Path   string `hcl:"path"`
-	When   *When  `hcl:"when,block"`
-}
-
-type Aws struct {
-	Name         string            `hcl:",label"`
-	Method       string            `hcl:"method"`
-	Role         string            `hcl:"role"`
-	RoleArn      string            `hcl:"role_arn,optional"`
-	Ttl          string            `hcl:"ttl"`
-	ExtraEnvVars map[string]string `hcl:"extra_env_vars,optional"`
-	Mount        string            `hcl:"mount,optional"`
-}
-
-func (a *Aws) IsEmpty() bool {
-	return reflect.DeepEqual(a, Aws{})
-}
-
-type Azure struct {
-	Name         string            `hcl:",label"`
-	Role         string            `hcl:"role"`
-	ExtraEnvVars map[string]string `hcl:"extra_env_vars,optional"`
-	Mount        string            `hcl:"mount,optional"`
-}
-
-func (a *Azure) IsEmpty() bool {
-	return reflect.DeepEqual(a, Azure{})
-}
-
-type Ad struct {
-	Name           string            `hcl:",label"`
-	Role           string            `hcl:"role"`
-	Mount          string            `hcl:"mount,optional"`
-	TargetProvider string            `hcl:"target_provider"`
-	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
-}
-
-type KvSecret struct {
-	Name           string            `hcl:",label"`
-	Path           string            `hcl:"path"`
-	Mount          string            `hcl:"mount,optional"`
-	TargetProvider string            `hcl:"target_provider"`
-	AttributeMap   map[string]string `hcl:"attribute_map,optional"`
-	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
-}
-
-type When struct {
-	EnvPresent string `hcl:"env_present"`
-}
 
 // Parse will parse file content into valid config.
 func ParseConfig(filename string) (c *Config, err error) {
@@ -114,6 +38,13 @@ func ParseConfig(filename string) (c *Config, err error) {
 	}
 	var diags hcl.Diagnostics
 
+	// add hcl functions
+	ectx := &hcl.EvalContext{
+		Functions: map[string]function.Function{
+			"env": EnvFunc,
+		},
+	}
+
 	file, diags := hclsyntax.ParseConfig(src, filename, hcl.Pos{Line: 1, Column: 1})
 	if diags.HasErrors() {
 		return nil, fmt.Errorf("config parse: %w", diags)
@@ -121,7 +52,7 @@ func ParseConfig(filename string) (c *Config, err error) {
 
 	c = &Config{}
 
-	diags = gohcl.DecodeBody(file.Body, nil, c)
+	diags = gohcl.DecodeBody(file.Body, ectx, c)
 	if diags.HasErrors() {
 		return nil, fmt.Errorf("config parse: %w", diags)
 	}
@@ -133,6 +64,58 @@ func ProcessConfig(c *Config) error {
 	client, err := vaulthelper.GetVaultApiClient()
 	if err != nil {
 		return errors.Wrap(err, "failed to setup vault client")
+	}
+
+	// add an implicit empty auth which will default to env/credential helpers
+	implicitAuth := &Auth{
+		Priority: 0,
+	}
+	authMethods := []*Auth{}
+	authMethods = append(authMethods, implicitAuth)
+
+	// loop over Auth blocks and build a slice of valid entries based on conditions
+	// TODO: refactor to support more conditions
+	for _, v := range c.Auth {
+		if !v.IsEmpty() {
+			if v.When != nil && v.When.EnvPresent != "" {
+				env := os.Getenv(v.When.EnvPresent)
+				if env != "" {
+					authMethods = append(authMethods, v)
+				}
+			} else {
+				authMethods = append(authMethods, v)
+			}
+		}
+	}
+
+	// sort auth methods by priority
+	sort.Slice(authMethods, func(i, j int) bool {
+		return authMethods[i].Priority > authMethods[j].Priority
+	})
+
+	auth := authMethods[0]
+
+	switch auth.Method {
+	case "jwt":
+		if auth.Jwt == nil {
+			return fmt.Errorf("config error: jwt{} block not set for auth.name = %s", auth.Name)
+		}
+		secret, err := vaulthelper.AuthJwt(client, auth.Path, auth.Jwt.Role, auth.Jwt.Token)
+		if err != nil {
+			return errors.Wrap(err, "failed to authenticate against JWT endpoint")
+		}
+
+		if secret.Auth.ClientToken != "" {
+			client.SetToken(secret.Auth.ClientToken)
+		} else {
+			return fmt.Errorf("no ClientToken in JWT response")
+		}
+	// fall back to credentials helper / env
+	default:
+		err = vaulthelper.SetVaultTokenFromEnvOrHandler(client)
+		if err != nil {
+			return errors.Wrap(err, "failed to set client token")
+		}
 	}
 
 	// loop over Ad secrets engine entries and process them
@@ -177,7 +160,7 @@ func ProcessConfig(c *Config) error {
 	for _, v := range c.KvSecret {
 		switch v.TargetProvider {
 		case "vsphere":
-			secret, err := vaulthelper.ReadKv2SecretsEngine(client, v.Mount, v.Path, v.AttributeMap)
+			secret, err := vaulthelper.ReadKv2SecretsEngineUserPass(client, v.Mount, v.Path, v.AttributeMap)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault kv2 secrets engine")
 			}
@@ -187,7 +170,7 @@ func ProcessConfig(c *Config) error {
 				return errors.Wrap(err, "failed to set vsphere environment variables")
 			}
 		case "infoblox":
-			secret, err := vaulthelper.ReadKv2SecretsEngine(client, v.Mount, v.Path, v.AttributeMap)
+			secret, err := vaulthelper.ReadKv2SecretsEngineUserPass(client, v.Mount, v.Path, v.AttributeMap)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault kv2 secrets engine")
 			}
@@ -197,7 +180,7 @@ func ProcessConfig(c *Config) error {
 				return errors.Wrap(err, "failed to set Infoblox environment variables")
 			}
 		case "f5":
-			secret, err := vaulthelper.ReadKv2SecretsEngine(client, v.Mount, v.Path, v.AttributeMap)
+			secret, err := vaulthelper.ReadKv2SecretsEngineUserPass(client, v.Mount, v.Path, v.AttributeMap)
 			if err != nil {
 				return errors.Wrap(err, "reading Vault kv2 secrets engine")
 			}
