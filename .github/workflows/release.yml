@@ -15,10 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: wangyoucao577/go-release-action@v1.20
+        env:
+          CGO_ENABLED: 0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           goversion: "1.16"
           binary_name: "tfvaultenv"
-          extra_files: LICENSE README.md
+          ldflags: '-extldflags "-static"'
+          build_flags: "-a"
