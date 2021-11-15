@@ -35,6 +35,8 @@ Configuration is set in blocks representing supported secrets engines and authen
 
 ### Secrets Engines
 
+Currently all secrets engines use the same Vault client and because of that `tfvaultenv` only supports a single Vault backend configured via `VAULT_ADDR` environment variables. A feature is planned to be able to support multiple Vault backends and Namespaces.
+ 
 #### AWS
 
 ##### Example
