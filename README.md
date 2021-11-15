@@ -128,13 +128,13 @@ kv_secret "infoblox" {
 
 ### Auth Methods
 
-Currently `tfvaultenv` only supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Future support for JWT, AWS, Azure, GCP, PKI, and other methods are planned. See the [roadmap](ROADMAP.md) for more details.
+By default `tfvaultenv` creates an implicit auth method that supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Supported auth methods such as JWT (see below) can be used and can override token auth by configuring a priority of 1 or above. Auth methods can be conditionally activated using `when {}` blocks based on environment variables or other supported conditions. When multiple auth methods are defined you can specify priorities to ensure that the preferred fallback auth method is used.
 
 #### Common arguments
 
 - `method`: (Required) Name of the Vault authentication method
 - `path`: (Required) Path to the auth engine mount
-- `priority`: (Required) Priority
+- `priority`: (Required) Priority - set > 0 to override implicit token based auth
 - `when`: (Optional) Conditional block methods to determine if the auth method should be used. Currently only `env_present` is supported.
 
 #### JWT
