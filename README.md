@@ -23,6 +23,7 @@ Currently supported are:
 - [Infoblox](https://registry.terraform.io/providers/infobloxopen/infoblox/latest)
 - [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest)
 - [AzureRM](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
+- Other Terraform providers via the kv_secret `generic` provider
 
 ## Installation
 
