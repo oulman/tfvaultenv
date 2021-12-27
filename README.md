@@ -13,6 +13,8 @@ Currently supported are:
 - [Active Directory](https://www.vaultproject.io/docs/secrets/ad) (Password Rotation)
 - [Kv2](https://www.vaultproject.io/docs/secrets/kv/kv-v2)
 - [AWS](https://www.vaultproject.io/docs/secrets/aws) (STS only currently)
+- [Azure](https://www.vaultproject.io/docs/secrets/azure)
+
 
 ### Terraform Providers
 
@@ -20,6 +22,7 @@ Currently supported are:
 - [F5 BIG IP](https://registry.terraform.io/providers/F5Networks/bigip/latest)
 - [Infoblox](https://registry.terraform.io/providers/infobloxopen/infoblox/latest)
 - [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest)
+- [AzureRM](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
 
 ## Installation
 
