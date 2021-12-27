@@ -93,3 +93,47 @@ func parseAttributeMap(attributeMap map[string]string) map[string]string {
 	}
 	return attributeMap
 }
+
+func ReadKv2SecretsEngineGeneric(client *api.Client, mountPath string, secretPath string, attributeMap map[string]string) (map[string]string, error) {
+	resp := make(map[string]string)
+
+	if mountPath == "" {
+		mountPath = defaultKv2SecretEnginePath
+	}
+
+	if secretPath == "" {
+		return resp, errors.New("empty rolename provided to secrets engine reader")
+	}
+
+	if attributeMap == nil {
+		return resp, errors.New("empty attributeMap provided to secrets engine reader")
+	}
+
+	vaultSecretPath := fmt.Sprintf("%s/data/%s", mountPath, secretPath)
+
+	secret, err := client.Logical().Read(vaultSecretPath)
+	if err != nil {
+		return resp, errors.Wrap(err, fmt.Sprintf("failed to read secret from Vault at %s\n", vaultSecretPath))
+	}
+
+	if secret == nil {
+		return resp, fmt.Errorf("failed to read secret from Vault at %s", vaultSecretPath)
+	}
+
+	m, ok := secret.Data["data"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("unable to extract secrets from kv2 response")
+	}
+
+	for k, v := range attributeMap {
+		resp[k], ok = m[v].(string)
+		if !ok {
+			return nil, fmt.Errorf("unable to extract %s=%v from kv2 response", k, v)
+		}
+		if resp[k] == "" {
+			return nil, fmt.Errorf("unable to extract %s=%v from kv2 response", k, v)
+		}
+	}
+
+	return resp, nil
+}
