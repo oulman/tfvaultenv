@@ -187,7 +187,17 @@ func ProcessConfig(c *Config) error {
 
 			_, err = providers.SetF5Env(secret.Username, secret.Password, v.ExtraEnvVars)
 			if err != nil {
-				return errors.Wrap(err, "failed to set vsphere environment variables")
+				return errors.Wrap(err, "failed to set f5 environment variables")
+			}
+		case "generic":
+			secretMap, err := vaulthelper.ReadKv2SecretsEngineGeneric(client, v.Mount, v.Path, v.AttributeMap)
+			if err != nil {
+				return errors.Wrap(err, "reading Vault kv2 secrets engine")
+			}
+
+			_, err = providers.SetGenericEnv(secretMap, v.ExtraEnvVars)
+			if err != nil {
+				return errors.Wrap(err, "failed to set generic environment variables")
 			}
 		default:
 			return fmt.Errorf("invalid target_provider for engine kv_secret: %s", v.TargetProvider)

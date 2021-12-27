@@ -128,6 +128,35 @@ kv_secret "infoblox" {
 - `target_provider`: (Required) Name of the Terraform provider to generate environment variables for
 - `extra_env_vars`: (Optional) Map of additional environment variables to set
 
+#### Kv2 Secret (Generic)
+
+You can use the "generic" target_provider when tfvaultenv doesnt directly support your Terraform provider.
+
+##### Example
+
+```hcl
+kv_secret "generic" {
+   path = "teams/ops/db/pgsql"
+   target_provider = "generic"
+   attribute_map = {
+       "PGUSER" = "psql_user"
+       "PGPASSWORD" = "psql_pass"
+   }
+   extra_env_vars = {
+       "PGHOST" = "foo.bar.com"
+       "PGPORT" = "12345"
+   } 
+}
+```
+
+##### Arguments
+
+- `path`: (Required) Path to the secret under the secrets engine mount
+- `mount`: (Optional) Mount name of the secrets engine. Default: "secrets"
+- `attribute_map`: (Optional) Map of kv2 secret attribute names to environment vasriable keys. 
+- `target_provider`: (Required) generic
+- `extra_env_vars`: (Optional) Map of additional environment variables to set
+
 ### Auth Methods
 
 By default `tfvaultenv` creates an implicit auth method that supports token based authentication in the form of VAULT_TOKEN, ~/.vault-token, and token helpers. Supported auth methods such as JWT (see below) can be used and can override token auth by configuring a priority of 1 or above. Auth methods can be conditionally activated using `when {}` blocks based on environment variables or other supported conditions. When multiple auth methods are defined you can specify priorities to ensure that the preferred fallback auth method is used.
