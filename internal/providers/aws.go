@@ -30,8 +30,8 @@ func SetAwsStsEnv(secret vaulthelper.AwsStsSecretsEngineResponse, extraEnvVars m
 	}
 
 	fmt.Printf("AWS_ACCESS_KEY_ID=%s\n", secret.AccessKey)
-	fmt.Printf("AWS_ACCESS_SECRET_KEY=%s\n", secret.SecretKey)
-	fmt.Printf("AWS_ACCESS_SESSION_TOKEN=%s\n", secret.SecurityToken)
+	fmt.Printf("AWS_SECRET_ACCESS_KEY=%s\n", secret.SecretKey)
+	fmt.Printf("AWS_SESSION_TOKEN=%s\n", secret.SecurityToken)
 
 	for k, v := range extraEnvVars {
 		fmt.Printf("%s=%s\n", k, v)
