@@ -26,7 +26,7 @@ func SetVsphereEnv(username string, password string, extraEnvVars map[string]str
 		return "", errors.New("vsphere username or password are empty")
 	}
 
-	fmt.Printf("VSPHERE_USERNAME=%s\n", username)
+	fmt.Printf("VSPHERE_USER=%s\n", username)
 	fmt.Printf("VSPHERE_PASSWORD=%s\n", password)
 
 	for k, v := range extraEnvVars {
