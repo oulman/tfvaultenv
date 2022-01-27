@@ -151,6 +151,27 @@ func ProcessConfig(c *Config) error {
 			if err != nil {
 				return errors.Wrap(err, "failed to set F5 environment variables")
 			}
+		case "generic":
+			secret, err := vaulthelper.ReadAdSecretsEngine(client, v.Role, v.Mount)
+			if err != nil {
+				return errors.Wrap(err, "reading Vault Ad secrets engine")
+			}
+
+			if v.UsernameEnvVar == "" || v.PasswordEnvVar == "" {
+				return fmt.Errorf("username_env_var and password_env_var are both required for AD generic provider")
+			}
+
+			// build a secret map between the desired environment variables
+			// and the AD-provided values
+			secretMap := map[string]string {
+				v.UsernameEnvVar: secret.Username,
+				v.PasswordEnvVar: secret.CurrentPassword,
+			}
+
+			_, err = providers.SetGenericEnv(secretMap, v.ExtraEnvVars)
+			if err != nil {
+				return errors.Wrap(err, "failed to set generic environment variables")
+			}
 		default:
 			return fmt.Errorf("invalid target_provider for engine ad: %s", v.TargetProvider)
 		}

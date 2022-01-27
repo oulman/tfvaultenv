@@ -74,6 +74,8 @@ type Ad struct {
 	Role           string            `hcl:"role"`
 	Mount          string            `hcl:"mount,optional"`
 	TargetProvider string            `hcl:"target_provider"`
+	UsernameEnvVar string	 		 `hcl:"username_env_var,optional"`
+	PasswordEnvVar string	 		 `hcl:"password_env_var,optional"`
 	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
 }
 
