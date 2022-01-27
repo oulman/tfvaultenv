@@ -182,6 +182,7 @@ By default `tfvaultenv` creates an implicit auth method that supports token base
 - `path`: (Required) Path to the auth engine mount
 - `priority`: (Required) Priority - set > 0 to override implicit token based auth
 - `when`: (Optional) Conditional block methods to determine if the auth method should be used. Currently only `env_present` is supported.
+- `export_vault_token`: (Optional) Print the token to the `VAULT_TOKEN` environment variable.
 
 #### JWT
 

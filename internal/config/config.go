@@ -110,6 +110,10 @@ func ProcessConfig(c *Config) error {
 		} else {
 			return fmt.Errorf("no ClientToken in JWT response")
 		}
+
+		if auth.ExportToken {
+			vaulthelper.PrintVaultToken(secret.Auth.ClientToken)
+		}
 	// fall back to credentials helper / env
 	default:
 		err = vaulthelper.SetVaultTokenFromEnvOrHandler(client)
@@ -163,7 +167,7 @@ func ProcessConfig(c *Config) error {
 
 			// build a secret map between the desired environment variables
 			// and the AD-provided values
-			secretMap := map[string]string {
+			secretMap := map[string]string{
 				v.UsernameEnvVar: secret.Username,
 				v.PasswordEnvVar: secret.CurrentPassword,
 			}

@@ -47,3 +47,7 @@ func SetVaultTokenFromEnvOrHandler(client *api.Client) error {
 		return fmt.Errorf("failed to get token from environment or credential helper")
 	}
 }
+
+func PrintVaultToken(token string) {
+	fmt.Printf("VAULT_TOKEN=%s\n", token)
+}

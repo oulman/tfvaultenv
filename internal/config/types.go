@@ -27,12 +27,13 @@ type Config struct {
 }
 
 type Auth struct {
-	Name     string   `hcl:",label"`
-	Method   string   `hcl:"method"`
-	Path     string   `hcl:"path"`
-	When     *When    `hcl:"when,block"`
-	Priority int      `hcl:"priority,optional"`
-	Jwt      *AuthJwt `hcl:"jwt,block"`
+	Name        string   `hcl:",label"`
+	Method      string   `hcl:"method"`
+	Path        string   `hcl:"path"`
+	When        *When    `hcl:"when,block"`
+	Priority    int      `hcl:"priority,optional"`
+	ExportToken bool     `hcl:"export_vault_token,optional"`
+	Jwt         *AuthJwt `hcl:"jwt,block"`
 }
 
 func (a *Auth) IsEmpty() bool {
@@ -74,8 +75,8 @@ type Ad struct {
 	Role           string            `hcl:"role"`
 	Mount          string            `hcl:"mount,optional"`
 	TargetProvider string            `hcl:"target_provider"`
-	UsernameEnvVar string	 		 `hcl:"username_env_var,optional"`
-	PasswordEnvVar string	 		 `hcl:"password_env_var,optional"`
+	UsernameEnvVar string            `hcl:"username_env_var,optional"`
+	PasswordEnvVar string            `hcl:"password_env_var,optional"`
 	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
 }
 
