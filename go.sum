@@ -263,6 +263,7 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
+github.com/denisenkom/go-mssqldb v0.11.0/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/denverdino/aliyungo v0.0.0-20170926055100-d3308649c661/go.mod h1:dV8lFg6daOBZbT6/BDGIz6Y3WFGn8juu6G+CQ6LHtl0=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
@@ -543,6 +544,7 @@ github.com/hashicorp/go-immutable-radix v1.3.0/go.mod h1:0y9vanUI8NX6FsYoO3zeMjh
 github.com/hashicorp/go-immutable-radix v1.3.1 h1:DKHmCUm2hRBK510BaiZlwvpD40f8bJFeZnpfm2KLowc=
 github.com/hashicorp/go-immutable-radix v1.3.1/go.mod h1:0y9vanUI8NX6FsYoO3zeMjhV/C5i9g4Q3DwcSNZ4P60=
 github.com/hashicorp/go-kms-wrapping v0.6.7/go.mod h1:rmGmNzO/DIBzUyisFjeocXvazOlxgO5K8vsFQkUn7Hk=
+github.com/hashicorp/go-kms-wrapping v0.6.8/go.mod h1:rmGmNzO/DIBzUyisFjeocXvazOlxgO5K8vsFQkUn7Hk=
 github.com/hashicorp/go-kms-wrapping/entropy v0.1.0/go.mod h1:d1g9WGtAunDNpek8jUIEJnBlbgKS1N2Q61QkHiZyR1g=
 github.com/hashicorp/go-memdb v1.0.2/go.mod h1:I6dKdmYhZqU0RJSheVEWgTNWdVQH5QvTgIUQ0t/t32M=
 github.com/hashicorp/go-msgpack v0.5.3/go.mod h1:ahLV/dePpqEmjfWmKiqvPkv/twdG7iPBM1vqhUKIvfM=
@@ -625,6 +627,8 @@ github.com/hashicorp/serf v0.9.4/go.mod h1:UWDWwZeL5cuWDJdl0C6wrvrUwEqtQ4ZKBKKEN
 github.com/hashicorp/serf v0.9.5/go.mod h1:UWDWwZeL5cuWDJdl0C6wrvrUwEqtQ4ZKBKKENpqIUyk=
 github.com/hashicorp/vault v1.8.4 h1:c1XQJ3xataQRAz1hSw+Ipd+kUJp10IO1M57TKZD/gH0=
 github.com/hashicorp/vault v1.8.4/go.mod h1:2YsW51ZAWIDkjIxSm3D23iveop/78ejP/quf6JtgObI=
+github.com/hashicorp/vault v1.8.5 h1:U6sXkf4OReJ0yaUYDOe36jb6kF1fvnoaF5pYrpgGovE=
+github.com/hashicorp/vault v1.8.5/go.mod h1:TvhRRm1XhO7287nPOZ5VcoYmtE0OdMuBvFWFNMsHWqw=
 github.com/hashicorp/vault-plugin-auth-alicloud v0.9.0/go.mod h1:lyfBMcULXKJfVu8dNo1w9bUikV5oem5HKmJoWwXupnY=
 github.com/hashicorp/vault-plugin-auth-azure v0.8.0/go.mod h1:B8T1Xfy4SDWnor9CABIPmGseyBCOsuxJTtloxnDevQM=
 github.com/hashicorp/vault-plugin-auth-centrify v0.9.0/go.mod h1:tLY05v1tC+sfeeE6DF8RAC/MGw4gflomYfA28b4VULw=
@@ -673,6 +677,7 @@ github.com/hashicorp/vault/sdk v0.1.14-0.20210204230556-cf85a862b7c6/go.mod h1:c
 github.com/hashicorp/vault/sdk v0.2.0/go.mod h1:cAGI4nVnEfAyMeqt9oB+Mase8DNn3qA/LDNHURiwssY=
 github.com/hashicorp/vault/sdk v0.2.1/go.mod h1:WfUiO1vYzfBkz1TmoE4ZGU7HD0T0Cl/rZwaxjBkgN4U=
 github.com/hashicorp/vault/sdk v0.2.2-0.20211005222123-93e045565e4a/go.mod h1:NSB/8AGzKoCBMOCTOLwT/kQI3G5Hf+Wdkmz+orcwPO0=
+github.com/hashicorp/vault/sdk v0.2.2-0.20211101151547-6654f4b913f9/go.mod h1:NSB/8AGzKoCBMOCTOLwT/kQI3G5Hf+Wdkmz+orcwPO0=
 github.com/hashicorp/vault/sdk v0.3.0 h1:kR3dpxNkhh/wr6ycaJYqp6AFT/i2xaftbfnwZduTKEY=
 github.com/hashicorp/vault/sdk v0.3.0/go.mod h1:aZ3fNuL5VNydQk8GcLJ2TV8YCRVvyaakYkhZRoVuhj0=
 github.com/hashicorp/vic v1.5.1-0.20190403131502-bbfe86ec9443/go.mod h1:bEpDU35nTu0ey1EXjwNwPjI9xErAsoOCmcMb9GKvyxo=
