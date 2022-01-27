@@ -99,11 +99,22 @@ ad "vsphere" {
 }
 ```
 
+```hcl
+ad "generic" {
+   role = "tf-svc"
+   target_provider = "generic"
+   username_env_var = "TF_VAR_AD_USERNAME"
+   password_env_var = "TF_VAR_AD_PASSWORD"
+}
+```
+
 ##### Arguments
 
 - `role`: (Required) Name of the [Vault Active Directory Secrets Engine role name](https://www.vaultproject.io/docs/secrets/ad)
 - `target_provider`: (Required) Name of the Terraform provider to generate environment variables for
 - `extra_env_vars`: (Optional) Map of additional environment variables to set
+- `username_env_var`: (Optional/Required for generic provider) Environment variable to set to username
+- `password_env_var`: (Optional/Required for generic provider) Environment variable to set to password
 - `path`: (Optional) Path to the mounted AD secrets engine. Default: `ad`
 
 #### Kv2 Secret

@@ -26,6 +26,13 @@ ad "vsphere" {
    }
 }
 
+ad "generic" {
+   role = "tf-svc"
+   target_provider = "generic"
+   username_env_var = "TF_VAR_AD_USERNAME"
+   password_env_var = "TF_VAR_AD_PASSWORD"
+}
+
 ##
 # Kv2
 
