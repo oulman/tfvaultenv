@@ -78,6 +78,7 @@ type Ad struct {
 	UsernameEnvVar string            `hcl:"username_env_var,optional"`
 	PasswordEnvVar string            `hcl:"password_env_var,optional"`
 	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
+	ExpandEnv      bool              `hcl:"expand_env_vars,optional"`
 }
 
 type KvSecret struct {
@@ -87,6 +88,7 @@ type KvSecret struct {
 	TargetProvider string            `hcl:"target_provider"`
 	AttributeMap   map[string]string `hcl:"attribute_map,optional"`
 	ExtraEnvVars   map[string]string `hcl:"extra_env_vars,optional"`
+	ExpandEnv      bool              `hcl:"expand_env_vars,optional"`
 }
 
 type When struct {

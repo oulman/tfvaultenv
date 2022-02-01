@@ -172,7 +172,7 @@ func ProcessConfig(c *Config) error {
 				v.PasswordEnvVar: secret.CurrentPassword,
 			}
 
-			_, err = providers.SetGenericEnv(secretMap, v.ExtraEnvVars)
+			_, err = providers.SetGenericEnv(secretMap, v.ExtraEnvVars, v.ExpandEnv)
 			if err != nil {
 				return errors.Wrap(err, "failed to set generic environment variables")
 			}
@@ -220,7 +220,7 @@ func ProcessConfig(c *Config) error {
 				return errors.Wrap(err, "reading Vault kv2 secrets engine")
 			}
 
-			_, err = providers.SetGenericEnv(secretMap, v.ExtraEnvVars)
+			_, err = providers.SetGenericEnv(secretMap, v.ExtraEnvVars, v.ExpandEnv)
 			if err != nil {
 				return errors.Wrap(err, "failed to set generic environment variables")
 			}
