@@ -221,13 +221,6 @@ AWS_ACCESS_SECRET_KEY=nJJFD/<SNIP>
 AWS_ACCESS_SESSION_TOKEN=<SNIP>
 ```
 
-### Piping to Terraform
-
-```
-$ tfvaultenv get | terraform apply
-<SNIP>
-```
-
 ### Printing to stdout
 
 ```
