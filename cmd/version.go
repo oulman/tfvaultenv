@@ -26,7 +26,7 @@ import (
 var tfVaultEnvVersion string
 
 func init() {
-	tfVaultEnvVersion = "0.0.1"
+	tfVaultEnvVersion = "0.5.1"
 	rootCmd.AddCommand(versionCmd)
 }
 
